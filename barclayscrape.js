@@ -102,16 +102,13 @@ function login(casper, loginOpts) {
             
                 this.waitForSelector('input[name="firstMemorableCharacter"]', function loginStageOneB_Char1() {
                     this.click("div.dropdown.firstMemorableCharacter");
-                    this.waitForSelector("div.dropdown.firstMemorableCharacter div.dropdown__options-list.closed", function () {
-                        this.sendKeys('div.dropdown.firstMemorableCharacter', chars[0]);
-                    });
+                    this.sendKeys('div.dropdown.firstMemorableCharacter', chars[0]);
                 });
                 
                 this.waitForSelector('input[name="secondMemorableCharacter"]', function loginStageOneB_Char2() {
                     this.click("div.dropdown.secondMemorableCharacter");
                     this.waitForSelector('div.dropdown.secondMemorableCharacter', function () {
                         this.sendKeys('div.dropdown.secondMemorableCharacter', chars[1]);
-                        this.capture('debug-post.png');
                         this.waitForSelector("div.dropdown.secondMemorableCharacter div.dropdown__options-list.closed", function () {
                             this.click('button[title="Log in to Online Banking"]');
                         });
