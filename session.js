@@ -7,9 +7,15 @@ class Session {
     this.browser = await puppeteer.launch(options);
     this.page = await this.browser.newPage();
     this.logged_in = false;
+    
+    // set default timeout
+    this.page.setDefaultNavigationTimeout(5000);
+    this.page.setDefaultTimeout(5000);
+    
     //this.page.on('console', msg => console.log('PAGE LOG:', msg.text()));
     await this.page.setViewport({width: 1000, height: 1500});
-    await this.page.goto('https://bank.barclays.co.uk');
+    //await this.page.goto('https://bank.barclays.co.uk');
+    await u.goto(this.page, 'https://bank.barclays.co.uk');
   }
 
   async close() {
@@ -32,12 +38,16 @@ class Session {
     let selector = '[ng-controller="authTFACtrl"] ';
     
     // Wait for the login button which hopefully means the page has loaded.
-    await u.wait(this.page, 'button[title="Log in to Online Banking"]')
+    //await u.wait(this.page, 'button[title="Log in to Online Banking"]')
+    await u.wait(this.page, 'button[title="Continue"]')
     if (method == 'motp') {
+      u.log_op('Selecting login method', 'MOTP');
       selector += 'input#radio-c3';
     } else if (method == 'otp') {
       selector += 'input#radio-c4';
+      u.log_op('Selecting login method', 'OTP');
     } else if (method == 'plogin') {
+      u.log_op('Selecting login method', 'PLOGIN');
       selector += 'input#radio-c2';
     }
 
@@ -119,7 +129,8 @@ class Session {
             
             // arbitrary delay is not ideal, but have been unable to identify a suitable wait candidate for state update
             await this.page.waitFor(1000);
-            await u.click(this.page, 'button[title="Log in to Online Banking"]');
+            //await u.click(this.page, 'button[title="Log in to Online Banking"]');
+            await u.click(this.page, 'button[title="Continue"]')
             await this.ensureLoggedIn();
         }
     }
