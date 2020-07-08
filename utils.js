@@ -60,10 +60,16 @@ exports.dump_elements = async(page) => {
     console.log('  Found radio: ', radio);
   };
 
-  console.log('> Dumping available inputs');
+  console.log('> Dumping available text inputs');
   const input_list = await page.evaluate(() => Array.from(document.querySelectorAll('input[type="text"]'), element => 'ID: ["' + element.id + '"]'));
   for (let input of input_list) {
     console.log('  Found text input: ', input);
+  };
+  
+  console.log('> Dumping available password inputs');
+  const pwd_list = await page.evaluate(() => Array.from(document.querySelectorAll('input[type="password"]'), element => 'ID: ["' + element.id + '"]'));
+  for (let pwdinput of pwd_list) {
+    console.log('  Found password input: ', pwdinput);
   };
 
   console.log('> Dumping available buttons');
@@ -106,7 +112,7 @@ exports.getAttribute = (page, element, attribute) => {
 
 exports.log_op = (op, msg, page) => {
   let page_url = (typeof page != "undefined") ? page.url() + ' --> ' : '';
-  exports.oplog.push(new Date().toISOString().substring(0,19) + ' -- ' + op.padEnd(24, ' ') + page_url + msg);
+  exports.oplog.push(new Date().toISOString().substring(0,25) + ' -- ' + op.padEnd(24, ' ') + page_url + msg);
 }
 
 // Wait for a selector to become visible, and issue a nice error if it doesn't.
@@ -130,6 +136,40 @@ exports.wait = async (page, selector) => {
     throw err_msg;
   }
 };
+
+exports.wait_xpath = async (page, selector) => {
+  try {
+    exports.log_op('executing page.x selector', selector, page);
+	
+	  try
+    {
+       await page.waitForXPath(selector);
+    }
+    catch (err)
+    {
+        exports.log_op('interstitial page not found', selector, page);
+        return false;
+    }
+	
+    //page.$x(selector, {timeout: 30000});
+    exports.log_op('executing page.eval selector', selector, page);
+    //page.$eval(selector, el => { el.click() });
+  } catch (err) {
+    exports.log_op('wait FAILED', selector, page);
+    await raiseWarning(page, 'fetching', selector);
+    
+    await exports.dump_page(page);
+    await exports.dump_audit(page);
+
+    const err_msg = `Couldn't find XPATH selector ${selector} on page ${page.url()}.`;
+    
+    await exports.dump_elements(page);
+    await exports.dump_callstack(err);
+    
+//    console.log("\n" + err_msg);
+    throw err_msg;
+  }
+}
 
 exports.cssEsc = (string) => {
   return string.replace(/([\\'"])/g, '\\$1');

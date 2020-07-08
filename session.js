@@ -31,8 +31,29 @@ class Session {
     });
     await u.click(this.page, 'button[title="Next Step"]');
   }
+  
+  async loginBypassinterstitialPage(method) {
+    // check for pinSentry vs passcode button selection (button IDs and titles are identical, so we have to check the markup text)
+    u.log_op('Testing for interstitial page buttons', method);
+    let button_text = 'Log in with PINsentry';
+    
+    if (method == 'plogin')
+    {
+      button_text = 'Log in with passcode';
+    }
+    
+    const button = await u.wait_xpath(this.page, "//button[contains(., '" + button_text + "')]");
+    if (button) {
+      await button.click();
+	    return true;
+    }
+  	return false;
+  }
 
   async loginSelectMethod(method) {
+    // check for interstitial page confirming login method (seems to apply to users with both a personal and business account) 
+    await this.loginBypassinterstitialPage(method);
+    
     // Stage 2: If multiple auth methods are enabled for this account,
     // select the correct one.
     let selector = '[ng-controller="authTFACtrl"] ';
