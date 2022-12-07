@@ -46,7 +46,9 @@ module.exports = class Services {
 		// wait for download button
 		let download_button = "input[type='submit']#data-download";
 		await this.page.waitForSelector(download_button);
-		await this.page._client.send('Page.setDownloadBehavior', {behavior: 'allow', downloadPath: out_path+'/'})
+		
+		const client = await this.page.target().createCDPSession();
+		await client.send('Page.setDownloadBehavior', {behavior: 'allow', downloadPath: out_path+'/'});
 		await this.page.click(download_button);
 
 		// delay for download (is there a more reliable way to detect a completed download response?)
