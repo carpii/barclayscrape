@@ -51,8 +51,9 @@ class Session {
   }
 
   async ensureLoggedIn() {
+    //await u.wait(this.page, '.accounts-body');
     // using this selector for site redesign, but not confirmed its appropriate yet
-    await u.wait(this.page, '#welcomePMsg');
+    await u.wait(this.page, 'div.c-section.c-section--primary');
     this.logged_in = true;
   }
 
@@ -175,7 +176,9 @@ class Session {
 
   async home() {
     await u.click(this.page, '[aria-label="Home"]');
-    await u.wait(this.page, '#welcomePMsg');
+
+    //await u.wait(this.page, '.accounts-body');
+    await u.wait(this.page, 'div.c-section.c-section--primary');
   }
 }
 
