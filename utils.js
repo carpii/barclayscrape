@@ -1,3 +1,5 @@
+const fs = require('fs');
+
 // Look for a warning on the page and raise it as an error.
 async function raiseWarning(page, action, selector) {
   const warning = await page.$('.notification--warning');
@@ -11,6 +13,15 @@ async function raiseWarning(page, action, selector) {
 
 exports.screenshot = async(page, filename) => {
   await page.screenshot({path: filename, fullPage: true});
+}
+
+exports.dump_screenshot = async(page) => {
+  await page.screenshot({path: "./error.png", fullPage: true});
+}
+
+exports.dump_html = async(page) => {
+  const html = await page.content();
+  await fs.writeFileSync("./dump.html", html);
 }
 
 // Click a link and wait for the navigation state to go to idle.
