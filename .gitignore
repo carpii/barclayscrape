@@ -3,3 +3,6 @@
 .DS_Store
 export/
 node_modules
+dump.html
+.vscode/launch.json
+*.sh
