@@ -1,6 +1,6 @@
 {
   "name": "barclayscrape",
-  "version": "3.0.18",
+  "version": "3.1.00",
   "description": "Programmatically manipulate Barclays online banking",
   "main": "barclayscrape.js",
   "bin": {
@@ -8,14 +8,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/russss/barclayscrape.git"
+    "url": "git+https://github.com/carpii/barclayscrape.git"
   },
-  "author": "Russ Garrett",
+  "author": "carpii",
   "license": "GPL-3.0-or-later",
   "bugs": {
-    "url": "https://github.com/russss/barclayscrape/issues"
+    "url": "https://github.com/carpii/barclayscrape/issues"
   },
-  "homepage": "https://github.com/russss/barclayscrape#readme",
+  "homepage": "https://github.com/carpii/barclayscrape#readme",
   "dependencies": {
     "commander": "^6.2.1",
     "configstore": "^5.0.1",
