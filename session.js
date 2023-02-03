@@ -3,15 +3,16 @@ const u = require('./utils.js');
 const Account = require('./account.js');
 
 class Session {
-  // .accounts_body - used for business banking and pre-2023 personal banking
-  // div.c-section.c-section--primary - used for post-2023 personal banking
-  let selector_IsLoggedIn = '.accounts-body, div.c-section.c-section--primary';
-
   async init(options) {
     this.browser = await puppeteer.launch(options);
     this.page = await this.browser.newPage();
     this.logged_in = false;
-    //this.page.on('console', msg => console.log('PAGE LOG:', msg.text()));
+
+  // .accounts_body - used for business banking and pre-2023 personal banking
+  // div.c-section.c-section--primary - used for post-2023 personal banking
+  this.selector_IsLoggedIn = '.accounts-body, div.c-section.c-section--primary';
+
+  //this.page.on('console', msg => console.log('PAGE LOG:', msg.text()));
     await this.page.setViewport({width: 1000, height: 1500});
     await this.page.goto('https://bank.barclays.co.uk');
   }
@@ -56,7 +57,7 @@ class Session {
 
   async ensureLoggedIn() {
     // using this selector for site redesign, but not confirmed its appropriate yet
-    await u.wait(this.page, selector_IsLoggedIn);
+    await u.wait(this.page, this.selector_IsLoggedIn);
     this.logged_in = true;
   }
 
@@ -181,7 +182,7 @@ class Session {
     await u.click(this.page, '[aria-label="Home"]');
 
     // using this selector for site redesign, but not confirmed its appropriate yet
-    await u.wait(this.page, selector_IsLoggedIn);
+    await u.wait(this.page, this.selector_IsLoggedIn);
   }
 }
 
