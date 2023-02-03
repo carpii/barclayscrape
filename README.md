@@ -1,27 +1,23 @@
-Barclayscrape v3.0
+Barclayscrape v3.1
 ==================
-Code to programmatically manipulate Barclays online banking using
-[Puppeteer](https://github.com/GoogleChrome/puppeteer).
+Node.js code to programatically manipulate Barclays online banking using [Puppeteer](https://github.com/GoogleChrome/puppeteer).
+
+Fork changes
+------------
+This is maintenance fork of the original https://github.com/russss/barclayscrape
+Thanks to @russ for a very useful tool
+
+Fork includes changes to support 2023 Barclays site redesign, and some changes to support Business Banking accounts. 
 
 Installation
 ------------
 
-Barclayscrape requires node.js version 10 or above which can be
-installed through your OS's package manager or Homebrew. Once Node
-is installed, barclayscrape can be installed on your system using:
+Barclayscrape currently requires node.js version 14.21.1 or above which can be
+installed through your OS's package manager or Homebrew. 
 
-    $ sudo npm install -g barclayscrape
+Due to time constraints and the niche userbase, I do not plan on publishing future releases to npm
 
-The `barclayscrape` executable will be installed in your path.
-
-Alternatively, if you don't want to run npm as root, you can install
-it into `node_modules` in your home directory with:
-
-    $ npm install barclayscrape
-
-And you can then execute barclayscrape with:
-
-    $ npx barclayscrape
+To install, clone this repo and run from there using `node barclayscrape.js [options] [command]` 
 
 Usage
 -----
