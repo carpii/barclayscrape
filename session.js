@@ -156,7 +156,7 @@ class Session {
         acc.querySelector('.c-account__body a').getAttribute('href'),
         Array.from(acc.querySelectorAll('.c-account__detail--multi span')).map((span) => span.textContent.replace(/[^0-9]/g, '')).join(''),
         acc.querySelector('.c-account__body a').textContent.trim(),
-        acc.querySelector('.c-account__balance') !== null ? acc.querySelector('[description="Available balance"]').textContent.trim().replace(/[^0-9]/g, '') : ''
+        acc.querySelector('.c-account__balance') !== null ? acc.querySelector('[description="Available balance"]').textContent.trim().replace(/[^-0-9\.]/g, '') : ''
         ]
       });
     });
