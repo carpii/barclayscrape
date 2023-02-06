@@ -5,7 +5,7 @@ Node.js code to programatically manipulate Barclays online banking using [Puppet
 Fork changes
 ------------
 This is maintenance fork of the original https://github.com/russss/barclayscrape
-Thanks to @russss for a very useful tool
+Thanks to [@russss](https://github.com/russss) for a very useful tool
 
 Fork includes changes to support 2023 Barclays site redesign, and some changes to support Business Banking accounts. 
 
