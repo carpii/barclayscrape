@@ -37,12 +37,12 @@ program
 
     try {
       const accounts = await sess.accounts();
+      let account_list = accounts.map( function(acc) { return {'acc_no': acc.number, 'alias': exportLabel(acc), 'label': acc.label, 'balance': acc.balance} });
       if (options.json) {
-        let account_list = accounts.map( function(acc) { return {'number': acc.number, 'alias': exportLabel(acc), 'name': acc.label, 'balance': acc.balance} });
         console.log(JSON.stringify(account_list));
       }
       else {
-        console.table(accounts.map(acc => [acc.number, exportLabel(acc), acc.label, acc.balance]));
+        console.table(account_list);
       }
     } catch (err) {
       console.error(err);

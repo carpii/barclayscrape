@@ -150,13 +150,33 @@ class Session {
 
    
   async accounts() {
+    // by default only the first few accounts will be shown
+    // if a 'Show All' button exists, click that before proceeding, to reveal all accounts
+    const btn_exists = await this.page.$eval("#showAllButton button", () => true).catch(() => false)
+    if (btn_exists) {
+      await u.wait(this.page, "#showAllButton button")
+      await u.click_nonav(this.page, "#showAllButton button")
+    }
+
+    await u.wait(this.page, ".c-account__content")
+
+    // once the full list of accounts is shown, it potentially includes some accounts with different markup
+    // for example, mortgage and insurance accounts are shown differently
+    // because all of this runs within the context of the page, it has to be coded really defensively to avoid an in-browser exception
     let accData = await this.page.$$eval('.c-account__content', accounts => {
       return accounts.map(acc => {
+        const account_link = acc.querySelector('.c-account__body a')
+        const account_link_href = account_link != null ? account_link.getAttribute('href') : ''
+        const account_link_txt = account_link !== null ? account_link.textContent.trim() : ''
+        const account_balance = acc.querySelector('.c-account__balance [description="Available balance"]')
+        const account_balance_txt = account_balance != null ? account_balance.textContent.trim().replace(/[^-0-9\.]/g, '') : ''
+        const account_detail = Array.from(acc.querySelectorAll('.c-account__detail--multi span')).map((span) => span.textContent.replace(/[^0-9]/g, '')).join('')
+        
         return [
-        acc.querySelector('.c-account__body a').getAttribute('href'),
-        Array.from(acc.querySelectorAll('.c-account__detail--multi span')).map((span) => span.textContent.replace(/[^0-9]/g, '')).join(''),
-        acc.querySelector('.c-account__body a').textContent.trim(),
-        acc.querySelector('.c-account__balance') !== null ? acc.querySelector('[description="Available balance"]').textContent.trim().replace(/[^-0-9\.]/g, '') : ''
+          account_link_href,
+          account_detail,
+          account_link_txt, 
+          account_balance_txt,
         ]
       });
     });
