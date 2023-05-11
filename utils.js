@@ -11,17 +11,26 @@ async function raiseWarning(page, action, selector) {
   throw `Barclays Error: "${warningText.trim()}" (while ${action} ${selector})`;
 }
 
-exports.screenshot = async(page, filename) => {
+exports.dump_html_to = async(page, filename) => {
+  const html = await page.content();
+  await fs.writeFileSync(filename, html);
+}
+
+exports.dump_screenshot_to = async(page, filename) => {
   await page.screenshot({path: filename, fullPage: true});
 }
 
+exports.dump_to = async(page, prefix) => {
+  await exports.dump_screenshot_to(page, prefix+'.png')
+  await exports.dump_html_to(page, prefix+'.html')
+}
+
 exports.dump_screenshot = async(page) => {
-  await page.screenshot({path: "./error.png", fullPage: true});
+  exports.dump_screenshot_to(page, "./error.png");
 }
 
 exports.dump_html = async(page) => {
-  const html = await page.content();
-  await fs.writeFileSync("./dump.html", html);
+  exports.dump_html_to(page, "./dump.html");
 }
 
 // Click element then wait for any subsequent navigation to complete

@@ -9,16 +9,6 @@ module.exports = class Services {
 	  this.page = session.page;
 	}
 
-	async invoke_menu(page) {
-		// Download a single OFX for all accounts 
-		await page.waitForSelector("a.button.viewAllOnlineServices")
-
-		// nav menu has display: none, so we need to request the document clicks 'All Online Services' inline 
-		await page.evaluate(() => {
-			document.querySelector("a.button.viewAllOnlineServices").click();
-		});
-	}
-
 	async get_ofx_combined(out_path) {
 		// Barclays emits the download as data.ofx, unclear how to override this currently
 		let dest_basename = 'data.ofx'
@@ -29,21 +19,19 @@ module.exports = class Services {
 			await fs.unlink(dest_filename)
 		} catch(err) {
 		}
-		  
-		await this.invoke_menu(this.page);
-	
-		// click 'Export My Transaction data'
-		await this.page.waitForSelector("a#link_113")
-		await this.page.click("a#link_113")
 
-		// wait for download dialog
+		// click 'Export All Transaction Data' from header menu
+		await u.wait(this.page, "a[href$='/olb/balances/ExportDataStep1.action']");
+		await u.click(this.page, "a[href$='/olb/balances/ExportDataStep1.action']");
+		
+		// wait for download form 
 		await this.page.waitForSelector("form[name='process-form']");
 	
 		// click next in download dialog
 		await this.page.waitForSelector("input[type='submit']#next_step1");
 		await this.page.click("input[type='submit']#next_step1");
 
-		// wait for download button
+		// click download button
 		let download_button = "input[type='submit']#data-download";
 		await this.page.waitForSelector(download_button);
 		
