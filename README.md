@@ -88,3 +88,16 @@ PINSentry is still required to transfer funds to non-approved destinations.
 
 **SECURITY NOTE:** It is not recommended you use this feature, unless you are aware 
 of the security implications (credentials are NOT encrypted!).
+
+Parsing downloaded OFX to JSON
+-----------------------------------
+The `contrib` dir contains a simple PHP script, allowing you to parse an OFXv2 or OFXv3  into JSON output.
+
+    Usage:
+    
+    php ofx2json.php <ofx_filename>
+    
+  It is recommended to pipe this into `jq`, allowing you to filter or process the JSON further
+
+
+
