@@ -201,9 +201,8 @@ class Session {
   }
 
   async home() {
-    await u.click(this.page, '[aria-label="Home"]');
-
-    // using this selector for site redesign, but not confirmed its appropriate yet
+    await u.wait(this.page, "a[href$='/olb/balances/digital/btr/home']");
+    await u.click(this.page, "a[href$='/olb/balances/digital/btr/home']");
     await u.wait(this.page, this.selector_IsLoggedIn);
   }
 }
