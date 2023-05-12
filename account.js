@@ -12,24 +12,30 @@ module.exports = class Account {
   }
 
   async select() {
-    // Switch the page to this account.
-    // Call `await this.session.home()` to reset state when you're done.
-    console.log('Selecting account ' + this.number);
-    await this.page.$eval('[href="'+u.cssEsc(this.href)+'"]', el => { el.click() });
-    // waitForNavigation seems to stall indefinitely here (?!) so we don't use u.click
-    await u.wait(this.page, '.transaction-list-container-header');
+    // navigate to account-specific page
+    try {
+      await this.page.$eval('[href="'+u.cssEsc(this.href)+'"]', el => { el.click() });
+      await u.wait(this.page, '.transaction-list-container-header');
+    }
+    catch(err) {
+      console.warn("Warning: Could not retrieve account [" + this.number + "]. Possibly no transactions, or invalid accounttype.");
+      throw err;
+    }
   }
 
   async statementOFX() {
-    // Return an OFX-formatted string of the most recent account statement.
-    await this.select();
-    // waitFor is required here as of 12/2020
-    await this.page.waitForTimeout(1000);
-    if (!(await this.page.$('a.export'))) {
-      console.log(
-        'No export option (probably no transactions) for account ' +
-          this.number,
-      );
+    try {
+      // Return an OFX-formatted string of the most recent account statement.
+      await this.select();
+
+      // waitFor is required here as of 12/2020
+      await this.page.waitForTimeout(1000);
+
+      if (!(await this.page.$('a.export'))) {
+        await this.session.home();
+        return null;
+      }
+    } catch(err) {
       await this.session.home();
       return null;
     }
@@ -39,29 +45,35 @@ module.exports = class Account {
       let data = JSON.stringify({
         "hashTag": hashTag
       });
+      
       let url = "https://bank.barclays.co.uk/olb/trans/transdecouple/ControllerExportTransaction.do?hashTag=" + hashTag + "&param=" + data + "&downloadFormat=ofx";
       return fetch(url, {method: 'GET', credentials: 'include'}).then(r =>
         r.text(),
       );
     });
-    console.log('Fetched OFX for account ' + this.number);
+    console.log('Exported OFX for account [' + this.number + ']');
 
     await this.session.home();
     return ofx;
   }
 
   async statement(from, to) {
-    await this.select();
-    if ((await this.page.$('#no-trans-msg'))) {
-      console.log(
-        'No transactions for account ' +
-          this.number,
-      );
-      await this.session.home();
-      return [];
-    }
+    try {
+      await this.select();
+      if ((await this.page.$('#no-trans-msg'))) {
+        console.log(
+          'No transactions for account ' +
+            this.number,
+        );
+        await this.session.home();
+        return [];
+      }
 
-    await u.wait(this.page, '#search');
+      await u.wait(this.page, '#search');
+    } catch (err) {
+      await this.session.home();
+      throw(err);
+    }
 
     if (from) {
       let fromSelector = '[label="From date"] [name=datepicker]';
@@ -79,7 +91,6 @@ module.exports = class Account {
         angular.element(el).triggerHandler('input');
       }, to);
     }
-
 
     await this.page.$eval('#search', el => { el.click() });
 
@@ -136,23 +147,18 @@ module.exports = class Account {
     });
 
     let statement = [].slice.call(transactions);
-    let logLine = 'Fetched statement for account ' + this.number;
-    if (from) {
-      logLine += ' from=' + from;
-    }
-    if (to) {
-      logLine += ' to=' + to;
-    }
-    console.log(logLine);
-
     await this.session.home();
     return statement;
   }
 
   async statementCSV(from, to) {
     // Return a CSV-formatted string of the most recent account statement.
-    let statement  = await this.statement(from, to);
-    return this.csvLines(statement);
+    try {
+      let statement  = await this.statement(from, to);
+      return this.csvLines(statement);
+    } catch (err) {
+      return [];
+    }
   }
 
   csvLines(statement) {

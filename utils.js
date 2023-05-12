@@ -87,7 +87,7 @@ exports.wait = async (page, selector) => {
     raiseWarning(page, 'fetching', selector);
 
     await exports.dump_screenshot(page);
-    throw `Couldn't find selector "${selector}" on page ${page.url()}. Screenshot saved to error.png`;
+    throw new Error(`Couldn't find selector ${selector} on page ${page.url()}. Screenshot saved to error.png`);
   }
 };
 
