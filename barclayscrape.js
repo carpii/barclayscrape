@@ -117,6 +117,10 @@ program
   .option('-f, --from <dd/mm/yyyy>', 'From date')
   .option('-t, --to <dd/mm/yyyy>', 'To date')
   .action(async (options) => {
+
+    console.warn("# Warning: CSV feature is now deprecated, and will be removed in the near future");
+    console.warn("# If you still rely on this feature, please create a github issue at https://github.com/carpii/barclayscrape");
+    
     var sess;
     try {
       sess = await auth();
