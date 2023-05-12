@@ -60,6 +60,12 @@ program
 		  out_path = '.';
 		}
 
+    // check out_path directory exists
+    if (!fs.existsSync(path)) {
+      console.error("Error: Export dir of ["+out_path+"] does not exist. Aborting");
+      process.exit(1);
+    }
+
     var sess;
     try {
       sess = await auth();
