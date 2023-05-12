@@ -1,5 +1,5 @@
-Barclayscrape v3.1
-==================
+Barclayscrape v3.1.01
+=====================
 Node.js code to programatically manipulate Barclays online banking using [Puppeteer](https://github.com/GoogleChrome/puppeteer).
 
 Fork changes
