@@ -285,26 +285,27 @@ async function auth() {
         card_digits: conf.get('card_digits'),
         otp: program.otp,
       });
-  } else if (program.motp) {
-    await sess.loginMOTP({
-      surname: conf.get('surname'),
-      membershipno: conf.get('membershipno'),
-      motp: program.motp,
-    });
-  } else if (program.plogin) {
-    await sess.loginPasscode({
-      surname: conf.get('surname'),
-      membershipno: conf.get('membershipno'),
-      passcode: conf.get('passcode'),
-      password: conf.get('password'),
-      card_digits: conf.get('card_digits'),
-      card_cvv: conf.get('card_cvv'),
-  });
-}
+    } else if (program.motp) {
+      await sess.loginMOTP({
+        surname: conf.get('surname'),
+        membershipno: conf.get('membershipno'),
+        motp: program.motp,
+      });
+    } else if (program.plogin) {
+        await sess.loginPasscode({
+          surname: conf.get('surname'),
+          membershipno: conf.get('membershipno'),
+          passcode: conf.get('passcode'),
+          password: conf.get('password'),
+          card_digits: conf.get('card_digits'),
+          card_cvv: conf.get('card_cvv'),
+      });
+    }
   } catch (err) {
     try {
       await sess.close();
-    } catch (e) {}
+    } catch (e) {
+    }
     throw err;
   }
   return sess;
