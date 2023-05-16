@@ -61,7 +61,7 @@ program
 		}
 
     // check out_path directory exists
-    if (!fs.existsSync(path)) {
+    if (!fs.existsSync(out_path)) {
       console.error("Error: Export dir of ["+out_path+"] does not exist. Aborting");
       process.exit(1);
     }
