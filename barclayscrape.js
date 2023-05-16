@@ -105,6 +105,7 @@ program
       }
     } catch (err) {
       console.error(err);
+      process.exit(1);
     } finally {
       await sess.close();
     }
@@ -147,6 +148,7 @@ program
       }
     } catch (err) {
       console.error(err);
+      process.exit(1);
     } finally {
       await sess.close();
     }
@@ -208,7 +210,7 @@ program
       if (card_cvv == '') {
         // exit with error message
         console.log("Error: configuration was aborted due to blank CVV digits");
-        return;
+        process.exit(1);
       }
 
       // defer saving passcode login details, until all fields are valid
