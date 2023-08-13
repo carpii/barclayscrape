@@ -12,8 +12,7 @@ Fork includes changes to support 2023 Barclays site redesign, and some changes t
 Installation
 ------------
 
-Barclayscrape currently requires node.js version 14.21.1 or above which can be
-installed through your OS's package manager or Homebrew. 
+Barclayscrape requires Node.js v18.17.1 or above
 
 Due to time constraints and the niche userbase, I do not plan on publishing future releases to npm
 
