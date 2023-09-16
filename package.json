@@ -19,7 +19,7 @@
   "dependencies": {
     "commander": "^6.2.1",
     "configstore": "^5.0.1",
-    "puppeteer": "^19.11.1",
+    "puppeteer": "^21.2.1",
     "syncprompt": "^2.0.0"
   },
   "engines": {

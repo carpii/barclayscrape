@@ -275,7 +275,7 @@ async function auth() {
   // and containerised setups. My understanding is that disabling sandboxing shouldn't
   // cause a security issue as we're only using one tab anyway.
   const sess = await session.launch({
-    headless: program.headless,
+    headless: (program.headless ? "new" : false),
     args: ['--no-sandbox'],
   });
 
