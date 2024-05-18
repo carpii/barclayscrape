@@ -15,10 +15,13 @@ module.exports = class Account {
     // navigate to account-specific page
     try {
       await this.page.$eval('[href="'+u.cssEsc(this.href)+'"]', el => { el.click() });
-      await u.wait(this.page, '.transaction-list-container-header');
+      const found = await u.wait(this.page, '.transaction-list-container-header');
+      if (!found) {
+        throw new Error("Could not find .transaction-list-container-header");
+      }
     }
     catch(err) {
-      console.warn("Warning: Could not retrieve account [" + this.number + "]. Possibly no transactions, or invalid accounttype.");
+      console.warn("Warning: Could not retrieve account [" + this.number + "]. - " + err.toString());
       throw err;
     }
   }

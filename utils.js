@@ -26,11 +26,11 @@ exports.dump_to = async(page, prefix) => {
 }
 
 exports.dump_screenshot = async(page) => {
-  exports.dump_screenshot_to(page, "./error.png");
+  await exports.dump_screenshot_to(page, "./error.png");
 }
 
 exports.dump_html = async(page) => {
-  exports.dump_html_to(page, "./dump.html");
+  await exports.dump_html_to(page, "./dump.html");
 }
 
 // Click element then wait for any subsequent navigation to complete
@@ -40,7 +40,7 @@ exports.click = async (page, selector) => {
 
 // Click element without waiting for subsequent navigation (ie, clientside UI javascript) 
 exports.click_nonav = async (page, selector) => {
-  click_withnav(page, selector, false)
+  await click_withnav(page, selector, false)
 }
 
 click_withnav = async (page, selector, wait_for_nav) => {
