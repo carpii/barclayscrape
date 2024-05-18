@@ -112,49 +112,6 @@ program
   });
 
 program
-  .command('csv')
-  .option('-p, --path <path>', 'Export path. defaults to ./export')
-  .description('Fetch .csv files for accounts')
-  .option('-f, --from <dd/mm/yyyy>', 'From date')
-  .option('-t, --to <dd/mm/yyyy>', 'To date')
-  .action(async (options) => {
-
-    console.warn("# Warning: CSV feature is now deprecated, and will be removed in the near future");
-    console.warn("# If you still rely on this feature, please create a github issue at https://github.com/carpii/barclayscrape");
-    
-    var sess;
-    try {
-      sess = await auth();
-    } catch (err) {
-      console.error(err);
-      return;
-    }
-
-    try {
-      const accounts = await sess.accounts();
-      for (let account of accounts) {
-        const csvLines = await account.statementCSV(options.from, options.to);
-        if ((csvLines) && (csvLines.length > 0)) {
-          var label = exportLabel(account);
-          var extraLog = '';
-          if (label != account.number) {
-              extraLog = ' (' + account.number + ')'
-          }
-          let csv = [].join.call(csvLines, '\n');
-          let out_path = options.path || 'export';
-          console.log("Exporting " + label + extraLog + " (" + (csvLines.length - 1) + " rows)");
-          await fs_writeFile(path.join(out_path, label) + '.csv', csv);
-        }
-      }
-    } catch (err) {
-      console.error(err);
-      process.exit(1);
-    } finally {
-      await sess.close();
-    }
-  });
-
-program
   .command('config')
   .description('Set up login details')
   .action(options => {
