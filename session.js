@@ -8,11 +8,11 @@ class Session {
     this.page = await this.browser.newPage();
     this.logged_in = false;
 
-  // .accounts_body - used for business banking and pre-2023 personal banking
-  // div.c-section.c-section--primary - used for post-2023 personal banking
-  this.selector_IsLoggedIn = '.accounts-body, div.c-section.c-section--primary';
+    // .accounts_body - used for business banking and pre-2023 personal banking
+    // div.c-section.c-section--primary - used for post-2023 personal banking
+    this.selector_IsLoggedIn = '.accounts-body, div.c-section.c-section--primary';
 
-  //this.page.on('console', msg => console.log('PAGE LOG:', msg.text()));
+    //this.page.on('console', msg => console.log('PAGE LOG:', msg.text()));
     await this.page.setViewport({width: 1000, height: 1500});
     await this.page.goto('https://bank.barclays.co.uk');
   }
@@ -56,7 +56,6 @@ class Session {
   }
 
   async ensureLoggedIn() {
-    // using this selector for site redesign, but not confirmed its appropriate yet
     await u.wait(this.page, this.selector_IsLoggedIn);
     this.logged_in = true;
   }
@@ -201,9 +200,9 @@ class Session {
   }
 
   async home() {
-    await u.wait(this.page, "a[href$='/olb/balances/digital/btr/home']");
-    await u.click(this.page, "a[href$='/olb/balances/digital/btr/home']");
-    await u.wait(this.page, this.selector_IsLoggedIn);
+      await u.wait(this.page, "a[href$='/olb/balances/digital/btr/home']");
+      await u.click(this.page, "a[href$='/olb/balances/digital/btr/home']");
+      await u.wait(this.page, this.selector_IsLoggedIn);
   }
 }
 

@@ -1,7 +1,7 @@
 const fs = require('fs');
 
 // Look for a warning on the page and raise it as an error.
-async function raiseWarning(page, action, selector) {
+async function check_for_webpage_warning(page, action, selector) {
   const warning = await page.$('.notification--warning');
   if (!warning) {
     return
@@ -13,7 +13,7 @@ async function raiseWarning(page, action, selector) {
 
 exports.dump_html_to = async(page, filename) => {
   const html = await page.content();
-  await fs.writeFileSync(filename, html);
+  fs.writeFileSync(filename, html);
 }
 
 exports.dump_screenshot_to = async(page, filename) => {
@@ -40,7 +40,7 @@ exports.click = async (page, selector) => {
 
 // Click element without waiting for subsequent navigation (ie, clientside UI javascript) 
 exports.click_nonav = async (page, selector) => {
-  await click_withnav(page, selector, false)
+  click_withnav(page, selector, false)
 }
 
 click_withnav = async (page, selector, wait_for_nav) => {
@@ -57,7 +57,7 @@ click_withnav = async (page, selector, wait_for_nav) => {
       ]);
     }
   } catch (err) {
-    raiseWarning(page, 'clicking', selector);
+    check_for_webpage_warning(page, 'clicking', selector);
 
     await exports.dump_screenshot(page);
     throw `Error when clicking ${selector} on URL ${page.url()}: ${err}`;
@@ -84,7 +84,7 @@ exports.wait = async (page, selector) => {
   try {
     await page.waitForSelector(selector, {timeout: 30000});
   } catch (err) {
-    raiseWarning(page, 'fetching', selector);
+    check_for_webpage_warning(page, 'fetching', selector);
 
     await exports.dump_screenshot(page);
     throw new Error(`Couldn't find selector ${selector} on page ${page.url()}. Screenshot saved to error.png`);

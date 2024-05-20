@@ -76,7 +76,7 @@ program
         console.error(err);
       }
     } catch (err) {
-      console.error(err);
+      console.error("Exception in get_ofx_combined: " + err);
       return;
     } finally {
       await sess.close();
@@ -91,19 +91,24 @@ program
     try {
       sess = await auth();
     } catch (err) {
-      console.error(err);
+      console.error("Exception in auth: " + err);
       return;
     }
 
     try {
       const accounts = await sess.accounts();
+      var serv = new services(sess);
       for (let account of accounts) {
-        const ofx = await account.statementOFX();
-        if (ofx) {
-          await fs_writeFile(path.join(out_path, exportLabel(account)) + '.ofx', ofx);
+        try {
+          await sess.home();
+          await serv.get_ofx_for_account(out_path, account.number);
+        } catch (err) {
+          console.log("Exception in get_ofx_for_account: " + err);
         }
       }
+      
     } catch (err) {
+      console.log("Exception in get_ofx cmd: " + err);
       console.error(err);
       process.exit(1);
     } finally {
