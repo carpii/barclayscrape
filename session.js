@@ -186,15 +186,7 @@ class Session {
         return;
       }
 
-      res.push(
-        new Account(
-          this,
-          a[0],
-          a[1],
-          a[2],
-          a[3]
-        ),
-      );
+      res.push(new Account(this, a[0], a[1], a[2], a[3]));
     });
     return res;
   }

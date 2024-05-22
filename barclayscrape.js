@@ -103,7 +103,7 @@ program
           await sess.home();
           await serv.get_ofx_for_account(out_path, account.number);
         } catch (err) {
-          console.log("Exception in get_ofx_for_account: " + err);
+          console.error("Exception in get_ofx_for_account: " + err);
         }
       }
       

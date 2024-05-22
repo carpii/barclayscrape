@@ -12,13 +12,21 @@ module.exports = class Services {
 	async select_account_to_download(account_number) {
 		try {
 			// try to expand dropdown list
-			await u.wait(this.page, "div.holder.account-list");
-			await u.click_nonav(this.page, "div.holder.account-list");
+			await u.wait(this.page, "#productIdentifier p");
+			await u.click_nonav(this.page, "#productIdentifier p");
 
-			// try to select account item in list
-			const selector_account = "input[type='radio'][value='" + account_number + "']";
-			await u.wait(this.page, selector_account);
-			await u.click_nonav(this.page, selector_account);
+			// default to MS Money 2002 export format
+			const optionid_ofx = 7;
+			const format_input = "input[type='radio'][name='reqSoftwarePkgCode'][value='" + optionid_ofx + "']";;
+			const format_selector = "div.option:has("+format_input+")";
+			await u.wait(this.page, format_selector);
+			await u.click_nonav(this.page, format_selector);
+
+			// select account item in list
+			const selector_account = "input[type='radio'][name='productIdentifier'][value='" + account_number + "']";
+			const label_selector = "div.option:has("+selector_account+")";
+			await u.wait(this.page, label_selector);
+			await u.click_nonav(this.page, label_selector);
 			return true;
 		}
 		catch (err) { 
@@ -65,8 +73,38 @@ module.exports = class Services {
 		await this.page.waitForSelector("input[type='submit']#next_step1");
 		await this.page.click("input[type='submit']#next_step1");
 
+		// if were downloading for single account, check if its asking for a date range to be input
+		// then grab the fullest extent based on its suggestion
+		if (account_number != null) {
+			await this.page.waitForSelector("div#modal-core div.main p strong");
+			const default_dates = await this.page.$$eval('div#modal-core div.main p strong', (elements) => {
+				const matches = [];
+				elements.forEach(element => {
+					let date_regex = /[0-9]{2}\/[0-9]{2}\/[0-9]{4}/;
+					if (date_regex.test(element.textContent)) {
+					matches.push(element.textContent);
+				  }
+				});
+				return matches;
+			  });
+
+			  if (default_dates.length < 2) {
+				await u.dump_screenshot(this.page);
+				throw new Error(`Failed to parse 2 dates from get_ofx download modal. Screenshot saved to error.png`);
+			  }
+
+			  await this.page.waitForSelector("input#fromExportDate");
+			  await u.fillField(this.page, "input#fromExportDate", default_dates[0]);
+
+			  await this.page.waitForSelector("input#toExportDate");
+			  await u.fillField(this.page, "input#toExportDate", default_dates[1])
+
+			  await this.page.waitForSelector("input[type='submit']#next_step1a");
+			  await u.click_nonav(this.page, "input[type='submit']#next_step1a");
+		}
+
 		// click download button
-		let download_button = "input[type='submit']#data-download";
+		let download_button = "input#data-download";
 		await this.page.waitForSelector(download_button);
 		
 		const client = await this.page.target().createCDPSession();
@@ -74,7 +112,7 @@ module.exports = class Services {
 		await this.page.click(download_button);
 
 		// delay for download (is there a more reliable way to detect a completed download response?)
-		await this.page.waitForTimeout(5000);
+		await this.page.waitForTimeout(2000);
 	
 		// error checking for existence of download file
 		try {
@@ -84,18 +122,16 @@ module.exports = class Services {
 			}
 
 			try {
-				if (default_filename != dest_filename) {
-					fs.renameSync(default_filename, dest_filename);
-				}
+				fs.renameSync(default_filename, dest_filename);
 			} catch (err) {
 				console.log('Error: Failed to rename "' + default_filename + '" to "' + dest_filename + '"');
 				return false;
 			}
 			
-			if (!fs.existsSync(dest_filename)) {
+			/*if (!fs.existsSync(dest_filename)) {
 				console.log('Error: Downloaded and renamed file does not exist: ' + dest_filename);
 				return false;
-			}
+			}*/
 
 			console.log('Exported: ' + dest_filename);
 		} catch(err) {

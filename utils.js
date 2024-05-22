@@ -35,12 +35,12 @@ exports.dump_html = async(page) => {
 
 // Click element then wait for any subsequent navigation to complete
 exports.click = async (page, selector) => {
-  click_withnav(page, selector, true)
+  await click_withnav(page, selector, true)
 };
 
 // Click element without waiting for subsequent navigation (ie, clientside UI javascript) 
 exports.click_nonav = async (page, selector) => {
-  click_withnav(page, selector, false)
+  await click_withnav(page, selector, false)
 }
 
 click_withnav = async (page, selector, wait_for_nav) => {
