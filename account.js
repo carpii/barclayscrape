@@ -35,6 +35,7 @@ module.exports = class Account {
       await this.page.waitForTimeout(1000);
 
       if (!(await this.page.$('a.export'))) {
+        console.warn("Warning: StatementOFX clicking a.export failed");
         await this.session.home();
         return null;
       }
