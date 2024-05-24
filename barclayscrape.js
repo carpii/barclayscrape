@@ -79,7 +79,9 @@ program
       console.error("Exception in get_ofx_combined: " + err);
       return;
     } finally {
-      await sess.close();
+      if (typeof(sess) != "undefined") {
+        await sess.close();
+      }
     }
   });
   

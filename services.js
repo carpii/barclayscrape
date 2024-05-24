@@ -127,11 +127,6 @@ module.exports = class Services {
 				console.log('Error: Failed to rename "' + default_filename + '" to "' + dest_filename + '"');
 				return false;
 			}
-			
-			/*if (!fs.existsSync(dest_filename)) {
-				console.log('Error: Downloaded and renamed file does not exist: ' + dest_filename);
-				return false;
-			}*/
 
 			console.log('Exported: ' + dest_filename);
 		} catch(err) {
