@@ -16,13 +16,13 @@
     "url": "https://github.com/carpii/barclayscrape/issues"
   },
   "homepage": "https://github.com/carpii/barclayscrape#readme",
-  "dependencies": {
-    "commander": "^6.2.1",
-    "configstore": "^5.0.1",
-    "puppeteer": "^21.2.1",
-    "syncprompt": "^2.0.0"
-  },
   "engines": {
     "node": ">=v18.17.1"
+  },
+  "dependencies": {
+    "commander": "^14.0.3",
+    "configstore": "^8.0.0",
+    "puppeteer": "^24.37.3",
+    "syncprompt": "^2.0.0"
   }
 }

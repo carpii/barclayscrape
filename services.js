@@ -112,7 +112,8 @@ module.exports = class Services {
 		await this.page.click(download_button);
 
 		// delay for download (is there a more reliable way to detect a completed download response?)
-		await this.page.waitForTimeout(2000);
+		//await this.page.waitForTimeout(2000);
+		await new Promise(r => setTimeout(r, 2000));
 	
 		// error checking for existence of download file
 		try {
