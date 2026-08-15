@@ -1,35 +1,38 @@
 #!/usr/bin/env node
-const util = require('util');
-const path = require('path');
-const fs = require('fs');
+import util from 'util';
+import path from 'path';
+import fs from 'fs';
 const fs_writeFile = util.promisify(fs.writeFile);
 
-const program = require('commander');
-const Configstore = require('configstore');
-const prompt = require('syncprompt');
+import { program, Option } from 'commander';
+import Configstore from 'configstore';
+import prompt from 'syncprompt';
 
-const pkg = require('./package.json');
-const session = require('./session.js');
-const services = require('./services.js');
+const pkg = JSON.parse(fs.readFileSync('./package.json', 'utf8'));
+import Session from './session.js';
+import Services from './services.js';
 
 const conf = new Configstore(pkg.name);
 
 program
   .version(pkg.version)
   .description('Programmatic access to Barclays online banking.')
-  .option('--otp [pin]', 'PINSentry code')
+  .addOption(new Option('--otp [pin]', 'PINSentry code').env('CODE'))
   .option('--motp [pin]', 'Mobile PINSentry code')
   .option('--plogin', 'Login using passcode and password')
   .option('--no-headless', 'Show browser window when interacting');
 
+console.log('Defining list');
 program
   .command('list')
   .option('-j, --json', 'Output account list as a JSON object')
   .description('List all available accounts')
-  .action(async options => {
+  .action(async function (options) {
+    console.log('List: Logging in');
     var sess;
+
     try {
-      sess = await auth();
+      sess = await auth(options);
     } catch (err) {
       console.error(err);
       return;
@@ -49,6 +52,7 @@ program
     } finally {
       await sess.close();
     }
+ 
   });
 
   program
@@ -70,7 +74,7 @@ program
     try {
       sess = await auth();
       try {
-        var serv = new services(sess);
+        var serv = new Services(sess);
         await serv.get_ofx_combined(out_path)
       } catch (err) {
         console.error(err);
@@ -89,6 +93,7 @@ program
   .command('get_ofx <out_path>')
   .description('Fetch individual ofx files for each account, into out_path directory')
   .action(async (out_path, options) => {
+    console.log('get_ofx: Logging in');
     var sess;
     try {
       sess = await auth();
@@ -99,7 +104,7 @@ program
 
     try {
       const accounts = await sess.accounts();
-      var serv = new services(sess);
+      var serv = new Services(sess);
       for (let account of accounts) {
         try {
           await sess.home();
@@ -206,7 +211,15 @@ program
     console.log('Credentials were saved to: ' + conf.path);
   });
 
-program.parse(process.argv);
+program.exitOverride((_err) => {
+  console.log(_err);
+});
+try {
+  program.parseAsync(process.argv).then(() => {});
+} catch (err) {
+  console.log(err);
+}
+
 
 function exportLabel(account) {
   let aliases = conf.get('aliases') || {};
@@ -214,6 +227,7 @@ function exportLabel(account) {
 }
 
 async function auth() {
+  console.log('Auth');
   if (!(conf.has('surname') && conf.has('membershipno'))) {
     console.error(
       'Barclayscrape has not been configured. Please run `barclayscrape config`',
@@ -221,43 +235,44 @@ async function auth() {
     program.help();
   }
 
-  if (!(program.otp || program.motp || program.plogin)) {
+  const options = program.opts();
+  if (!(options.otp || options.motp || options.plogin)) {
     console.error('Must specify either --otp, --motp or --plogin');
     program.help();
   }
 
-  if (program.otp && program.otp.length != 8) {
+  if (options.otp && options.otp.length != 8) {
     console.error('OTP should be 8 characters long');
     program.help();
   }
 
-  if (program.motp && program.motp.length != 8) {
-    program.motp = prompt('Enter your 8 digit mobile PIN sentry code: ');
+  if (options.motp && options.motp.length != 8) {
+    options.motp = prompt('Enter your 8 digit mobile PIN sentry code: ');
   }
 
   // The --no-sandbox argument is required here for this to run on certain kernels
   // and containerised setups. My understanding is that disabling sandboxing shouldn't
   // cause a security issue as we're only using one tab anyway.
-  const sess = await session.launch({
-    headless: (program.headless ? "new" : false),
+  const sess = await Session.launch({
+    headless: (options.noHeadless ? true: 'shell'),
     args: ['--no-sandbox'],
   });
 
   try {
-    if (program.otp) {
+    if (options.otp) {
       await sess.loginOTP({
         surname: conf.get('surname'),
         membershipno: conf.get('membershipno'),
         card_digits: conf.get('card_digits'),
-        otp: program.otp,
+        otp: options.otp,
       });
-    } else if (program.motp) {
+    } else if (options.motp) {
       await sess.loginMOTP({
         surname: conf.get('surname'),
         membershipno: conf.get('membershipno'),
-        motp: program.motp,
+        motp: options.motp,
       });
-    } else if (program.plogin) {
+    } else if (options.plogin) {
         await sess.loginPasscode({
           surname: conf.get('surname'),
           membershipno: conf.get('membershipno'),
